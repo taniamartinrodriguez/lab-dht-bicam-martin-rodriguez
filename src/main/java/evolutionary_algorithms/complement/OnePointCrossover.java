@@ -1,53 +1,32 @@
 package evolutionary_algorithms.complement;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import metaheurictics.strategy.Strategy;
-
+import java.util.concurrent.ThreadLocalRandom;
 import problem.definition.State;
 
-
+/** Cruce en un punto real (antes la posición era siempre cero por precedencia). */
 public class OnePointCrossover extends Crossover {
-
-	@Override
-	public State crossover(State father1, State father2, double PC) {
-				
-		State newInd = (State) father1.getCopy();
-		
-	    List<Object> ind1 = new ArrayList<Object>();
-	    List<Object> ind2 = new ArrayList<Object>();
-	    
-	    double number = (double) Math.random() * (double)(1);	
-		if(number <= PC){
-			//llenar los valores de cada hijo
-			int pos = (int) Math.random() * (int)(Strategy.getStrategy().getProblem().getCodification().getVariableCount() - 1); 
-			for (int i = 0; i < father1.getCode().size(); i++) {
-				if(i <= pos){
-					ind1.add(father1.getCode().get(i));
-					ind2.add(father2.getCode().get(i));
-				}
-				else{
-					ind1.add(father2.getCode().get(i));
-					ind2.add(father1.getCode().get(i));
-				}
-			}
-			/*
-			for (int j = pos; j < ind1.size(); j++) {
-		       for (int k = pos; k < ind2.size(); k++) {
-				  Integer value1 = (Integer) ind1.get(j);
-		    	  ind1.set(j, ind2.get(k));
-				  ind2.set(k,value1);
-			   }				  
-		    }*/
-			//generar un numero aleatorio 0 o 1, si es 0 me quedo con ind1 si es 1 con ind2.
-			int random = (int)(Math.random() * (double)(2));
-			if(random == 0)
-				newInd.setCode((ArrayList<Object>) ind1);
-			else newInd.setCode((ArrayList<Object>) ind2); 
-		}
-		return newInd;			
-	}
-	
-	
+    @Override
+    public State crossover(State father1, State father2, double PC) {
+        if (PC < 0.0 || PC > 1.0 || Double.isNaN(PC)) {
+            throw new IllegalArgumentException("PC debe estar entre 0 y 1");
+        }
+        int size = father1.getCode().size();
+        if (size != father2.getCode().size()) {
+            throw new IllegalArgumentException("Padres con longitudes diferentes");
+        }
+        State child = father1.clone();
+        if (size < 2 || ThreadLocalRandom.current().nextDouble() >= PC) {
+            return child;
+        }
+        int cut = ThreadLocalRandom.current().nextInt(1, size);
+        boolean startWithFirst = ThreadLocalRandom.current().nextBoolean();
+        ArrayList<Object> result = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            result.add((i < cut) == startWithFirst
+                    ? father1.getCode().get(i) : father2.getCode().get(i));
+        }
+        child.setCode(result);
+        return child;
+    }
 }

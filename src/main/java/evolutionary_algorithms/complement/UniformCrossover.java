@@ -1,38 +1,34 @@
 package evolutionary_algorithms.complement;
 
-import metaheurictics.strategy.Strategy;
-
+import java.util.concurrent.ThreadLocalRandom;
 import problem.definition.State;
 
+/** Cruce uniforme con máscara independiente para cada gen. */
 public class UniformCrossover extends Crossover {
-	
-	
-	public int[] mascara(int length){
-		int[] mascara = new int[length];
-		for (int i = 0; i < mascara.length; i++) {
-			int value = (int)(Math.random() * (int)(2));
-			mascara[0] = value;
-		}
-		return mascara;
-	}	
-    
-	@Override
-	public State crossover(State father1, State father2, double PC) {
-		Object value = new Object();
-		State state = (State) father1.getCopy();
-		int[] mascara = mascara(father1.getCode().size());
-   		for (int k = 0; k < mascara.length; k++) {
-   			if(mascara[k] == 1){
-   				value = father1.getCode().get(k);
-   				state.getCode().set(k, value);
-   			}
-   			else{
-   				if(mascara[k] == 0){
-   					value = father2.getCode().get(k);  
-   					state.getCode().set(k, value);
-   				}
-   			}
-		}
-		return state;
-	}
+    /** Devuelve una máscara nueva de ceros y unos. */
+    public int[] mascara(int length) {
+        if (length < 0) throw new IllegalArgumentException("Longitud negativa");
+        int[] mask = new int[length];
+        for (int i = 0; i < mask.length; i++) {
+            mask[i] = ThreadLocalRandom.current().nextInt(2);
+        }
+        return mask;
+    }
+
+    @Override
+    public State crossover(State father1, State father2, double PC) {
+        if (PC < 0 || PC > 1 || Double.isNaN(PC)) {
+            throw new IllegalArgumentException("PC debe estar entre 0 y 1");
+        }
+        if (father1.getCode().size() != father2.getCode().size()) {
+            throw new IllegalArgumentException("Padres con longitudes diferentes");
+        }
+        State result = father1.clone();
+        if (ThreadLocalRandom.current().nextDouble() >= PC) return result;
+        int[] mask = mascara(father1.getCode().size());
+        for (int i = 0; i < mask.length; i++) {
+            if (mask[i] == 0) result.getCode().set(i, father2.getCode().get(i));
+        }
+        return result;
+    }
 }

@@ -125,6 +125,8 @@
                         <format>HTML</format>
                         <format>JSON</format>
                     </formats>
+                    <!-- Incluir dependencias del alcance test, como JUnit 5. -->
+                    <skipTestScope>false</skipTestScope>
                     <!-- No ignoramos ninguna CVE detectada. -->
                     <failBuildOnCVSS>0</failBuildOnCVSS>
                     <!-- La clave NVD se guarda fuera del repositorio. -->
