@@ -65,15 +65,19 @@ def add(engine, rule, message, file_path, line, severity='MEDIUM', quality='MAIN
     if relative is None:
         return
     rule = str(rule or 'generic')
-    rid = f'{engine}:{rule}'
+    # Una regla externa tiene una gravedad fija. Si el analizador asigna
+    # prioridades distintas a apariciones de una misma regla, deben ser
+    # reglas externas diferentes para conservar la gravedad de cada aviso.
+    severity = normalize_severity(severity)
+    rid = f'{engine}:{rule}:{quality}:{severity}'
     if rid not in RULES:
         RULES[rid] = {
             'id': rid,
-            'name': rule,
-            'description': f'Regla {rule} informada por {engine}',
+            'name': f'{rule} ({quality.lower()}, {severity.lower()})',
+            'description': f'Regla {rule} informada por {engine} (calidad: {quality}; gravedad: {severity})',
             'engineId': engine,
             'cleanCodeAttribute': 'TRUSTWORTHY' if quality == 'SECURITY' else 'CONVENTIONAL',
-            'impacts': [{'softwareQuality': quality, 'severity': normalize_severity(severity)}],
+            'impacts': [{'softwareQuality': quality, 'severity': severity}],
         }
     location = {'message': ' '.join(str(message or rule).split())[:1000], 'filePath': relative}
     try:
@@ -123,6 +127,34 @@ def checkstyle():
                     'MEDIUM' if issue.get('severity') == 'error' else 'LOW')
 
 
+
+
+def spotbugs_quality(category, rule):
+    """Respeta las categorías de SpotBugs para no etiquetar estilo como bugs.
+
+    La clasificación es explícita, está documentada y NO descarta hallazgos.
+    Un subconjunto de reglas, aunque pertenezcan a STYLE/BAD_PRACTICE,
+    describen defectos de estado que sí pueden afectar a la fiabilidad.
+    """
+    if rule in {
+        'ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD',
+        'UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD',
+        'UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR',
+        'CN_IDIOM_NO_SUPER_CALL',
+        'CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE',
+    }:
+        return 'RELIABILITY'
+    return {
+        'CORRECTNESS': 'RELIABILITY',
+        'MT_CORRECTNESS': 'RELIABILITY',
+        'SECURITY': 'SECURITY',
+        'MALICIOUS_CODE': 'SECURITY',
+        'STYLE': 'MAINTAINABILITY',
+        'BAD_PRACTICE': 'MAINTAINABILITY',
+        'PERFORMANCE': 'MAINTAINABILITY',
+    }.get(category or '', 'MAINTAINABILITY')
+
+
 def spotbugs():
     root = parse_xml('spotbugsXml.xml')
     if root is None:
@@ -137,7 +169,7 @@ def spotbugs():
         for bug in parent:
             if tag(bug) != 'BugInstance':
                 continue
-            quality = 'SECURITY' if bug.get('category') == 'SECURITY' else 'RELIABILITY'
+            quality = spotbugs_quality(bug.get('category'), bug.get('type'))
             add('spotbugs', bug.get('type'), bug.get('message'), basefile,
                 bug.get('lineNumber'), bug.get('priority'), quality)
     # XML detallado de SpotBugs (contiene <SourceLine>), diferente del simplificado.
@@ -149,7 +181,7 @@ def spotbugs():
             loc = locations[0]
             file = 'src/main/java/' + loc.get('sourcepath', '').replace('\\', '/')
             desc = next((x.text for x in findall(bug, 'LongMessage') if x.text), '')
-            quality = 'SECURITY' if bug.get('category') == 'SECURITY' else 'RELIABILITY'
+            quality = spotbugs_quality(bug.get('category'), bug.get('type'))
             add('spotbugs', bug.get('type'), desc or bug.get('type'), file,
                 loc.get('start'), bug.get('priority'), quality)
 
