@@ -3,9 +3,9 @@ package evolutionary_algorithms.complement;
 import java.util.ArrayList;
 
 import config.tspDynamic.TSPState;
+import problem.definition.Codification;
+import java.util.Objects;
 
-
-import metaheurictics.strategy.Strategy;
 
 import problem.definition.State;
 
@@ -17,11 +17,16 @@ public class AIOMutation extends Mutation {
 	@Override
 	public State mutation(State state, double PM) {
 		// TODO Auto-generated method stub
-		int key = Strategy.getStrategy().getProblem().getCodification().getAleatoryKey(); //seleccionar aleatoriamente una ciudad
+		Objects.requireNonNull(state, "state");
+        Codification codification = MutationConfiguration.requireCodification();
+        if (state.getCode().size() < 2) {
+            return state;
+        }
+        int key = codification.getAleatoryKey(); //seleccionar aleatoriamente una ciudad
 		int key1 = 0;
 		boolean found = false;
 		while (found == false){
-			key1 = Strategy.getStrategy().getProblem().getCodification().getAleatoryKey();
+			key1 = codification.getAleatoryKey();
 			if(key1 != key)
 				found = true;
 		}
@@ -47,6 +52,8 @@ public class AIOMutation extends Mutation {
 	}
 	
 	public void sortedPathValue(State state) {
+        Objects.requireNonNull(state, "state");
+        path.clear();
 		for(int k = 0; k < state.getCode().size(); k++){
 			path.add( state.getCode().get(k));
 		}
@@ -64,7 +71,9 @@ public class AIOMutation extends Mutation {
 	}
 
 	public static void fillPath() {
-		for(int k = 0; k < Strategy.getStrategy().getProblem().getCodification().getVariableCount(); k++){
+		Codification codification = MutationConfiguration.requireCodification();
+        path.clear();
+        for (int k = 0; k < codification.getVariableCount(); k++) {
 			path.add(k);
 		}
 	}
