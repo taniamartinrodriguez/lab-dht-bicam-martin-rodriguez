@@ -174,7 +174,7 @@ def main():
     checkstyle()
     spotbugs()
     owasp_optional()
-    output = TARGET / 'sonar' / 'external-issues.json'
+    output = TARGET / 'external-issues.json'
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps({'rules': list(RULES.values()), 'issues': ISSUES},
                                  ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

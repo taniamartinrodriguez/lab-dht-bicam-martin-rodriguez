@@ -47,7 +47,7 @@ jobs:
             target/checkstyle-result.xml
             target/spotbugs.xml
             target/spotbugsXml.xml
-            target/sonar/external-issues.json
+            target/external-issues.json
 
       # La primera ejecucion en main falla de forma explicita si aun no
       # se han configurado las credenciales. No presenta una subida ficticia.
@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
           test -s target/site/jacoco/jacoco.xml
-          test -s target/sonar/external-issues.json
+          test -s target/external-issues.json
           mvn -B -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:5.6.0.6792:sonar \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.organization="$SONAR_ORGANIZATION" \

@@ -17,7 +17,7 @@
         <!-- SonarCloud lee la cobertura y los informes externos generados por CI. -->
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
-        <sonar.externalIssuesReportPaths>target/sonar/external-issues.json</sonar.externalIssuesReportPaths>
+        <sonar.externalIssuesReportPaths>target/external-issues.json</sonar.externalIssuesReportPaths>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
     </properties>
 
