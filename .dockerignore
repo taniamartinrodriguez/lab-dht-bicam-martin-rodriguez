@@ -2,12 +2,11 @@
 .github
 .idea
 .vscode
+.settings
 target
 **/target
-**/*.class
-**/*.jar
-!pom.xml
 docs/doxygen
 *.zip
 *.log
+**/*.class
 .DS_Store
