@@ -74,6 +74,13 @@ public class Problem {
 	}
 
 	public void Evaluate(State state) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        if (state == null) {
+            throw new IllegalArgumentException("No se puede evaluar un State nulo");
+        }
+        if (function == null || function.isEmpty() || function.get(0) == null) {
+            throw new IllegalStateException("El Problem requiere al menos una funcion objetivo");
+        }
+
 		double eval = 0;       
 		ArrayList<Double> evaluation = new ArrayList<Double>(this.function.size());
 		if (typeSolutionMethod == null) {

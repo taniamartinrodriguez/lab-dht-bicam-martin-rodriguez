@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -81,16 +82,17 @@ public class GeneticAlgorithm extends Generator {
     	iffatherselection = new FactoryFatherSelection();
     	FatherSelection selection = iffatherselection.createSelectFather(selectionType);
     	List<State> fathers = selection.selection(refList, truncation);
+        StrategyRequirements.requireStates(fathers);
     	int pos1 = (int)(Math.random() * fathers.size());
     	int pos2 = (int)(Math.random() * fathers.size());
     	
-    	State auxState1 = (State) Strategy.getStrategy().getProblem().getState().getCopy();
+    	State auxState1 = (State) StrategyRequirements.requireInitialState().getCopy();
     	auxState1.setCode(new ArrayList<Object>(fathers.get(pos1).getCode()));
     	auxState1.setEvaluation(fathers.get(pos1).getEvaluation());
     	auxState1.setNumber(fathers.get(pos1).getNumber());
     	auxState1.setTypeGenerator(fathers.get(pos1).getTypeGenerator());
     	
-    	State auxState2 = (State) Strategy.getStrategy().getProblem().getState().getCopy();
+    	State auxState2 = (State) StrategyRequirements.requireInitialState().getCopy();
     	auxState2.setCode(new ArrayList<Object>(fathers.get(pos2).getCode()));
     	auxState2.setEvaluation(fathers.get(pos2).getEvaluation());
     	auxState2.setNumber(fathers.get(pos2).getNumber());
@@ -112,8 +114,10 @@ public class GeneticAlgorithm extends Generator {
     
 	@Override
 	public State getReference() {
+        StrategyRequirements.requireStates(listState);
+
 		stateReferenceGA = listState.get(0);
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			for (int i = 1; i < listState.size(); i++) {
 				if(stateReferenceGA.getEvaluation().get(0) < listState.get(i).getEvaluation().get(0))
 					stateReferenceGA = listState.get(i);

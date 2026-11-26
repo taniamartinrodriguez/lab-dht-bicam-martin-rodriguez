@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class MultiobjectiveTabuSearch extends Generator {
 		this.typeAcceptation = AcceptType.AcceptNotDominatedTabu;
 		this.strategy = StrategyType.TABU;
 		@SuppressWarnings("unused")
-		Problem problem = Strategy.getStrategy().getProblem();
+		Problem problem = StrategyRequirements.requireProblem();
 		this.typeCandidate = CandidateType.RandomCandidate;
 		this.candidatevalue = new CandidateValue();
 		this.typeGenerator = GeneratorType.MultiobjectiveTabuSearch;
@@ -64,7 +65,7 @@ public class MultiobjectiveTabuSearch extends Generator {
 	@Override
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		List<State> neighborhood = new ArrayList<State>();
-		Problem problem = Strategy.getStrategy().getProblem();
+		Problem problem = StrategyRequirements.requireProblem();
 		//List<State> list = new ArrayList<State>();
 		//Devuelve la lista de soluciones no dominadas de todos los vecinos posibles de stateReferenceTS que no se encuentran en la lista Tabu
 		neighborhood = problem.getOperator().generatedNewState(stateReferenceTS, operatornumber);

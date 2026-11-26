@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -54,9 +55,9 @@ public class LimitThreshold extends Generator{
 		this.strategy = StrategyType.NORMAL;
 
 
-		Problem problem = Strategy.getStrategy().getProblem();
+		Problem problem = StrategyRequirements.requireProblem();
 
-		if(problem.getTypeProblem().equals(ProblemType.Maximizar)) {
+		if(StrategyRequirements.requireProblemType() == ProblemType.Maximizar) {
 			this.typeCandidate = CandidateType.GreaterCandidate;
 		}
 		else{
@@ -73,7 +74,7 @@ public class LimitThreshold extends Generator{
 	}
 	@Override
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		List<State> neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceLT, operatornumber);
+		List<State> neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceLT, operatornumber);
 	    State statecandidate = candidatevalue.stateCandidate(stateReferenceLT, typeCandidate, strategy, operatornumber, neighborhood);
 	    return statecandidate;
 	}

@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.vscode
+target
+**/target
+**/*.class
+**/*.jar
+!pom.xml
+docs/doxygen
+*.zip
+*.log
+.DS_Store

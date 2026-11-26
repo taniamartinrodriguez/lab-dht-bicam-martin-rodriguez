@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +49,7 @@ public class MultiobjectiveHillClimbingDistance extends Generator{
 	@Override
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		List<State> neighborhood = new ArrayList<State>();
-		neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceHC, operatornumber);
+		neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceHC, operatornumber);
 		State statecandidate = candidatevalue.stateCandidate(stateReferenceHC, typeCandidate, strategy, operatornumber, neighborhood);
 		return statecandidate;
 	}
@@ -59,13 +60,13 @@ public class MultiobjectiveHillClimbingDistance extends Generator{
 		//Agregando la primera solución a la lista de soluciones no dominadas
 		if(Strategy.getStrategy().listRefPoblacFinal.size() == 0){
 			Strategy.getStrategy().listRefPoblacFinal.add(stateReferenceHC.clone());
-			distanceSolution.add(new Double(0));
+			distanceSolution.add(0.0);
 		}
 		ifacceptCandidate = new FactoryAcceptCandidate();
 		AcceptableCandidate candidate = ifacceptCandidate.createAcceptCandidate(typeAcceptation);
 		State lastState = Strategy.getStrategy().listRefPoblacFinal.get(Strategy.getStrategy().listRefPoblacFinal.size()-1);
 		List<State> neighborhood = new ArrayList<State>();
-		neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceHC, sizeNeighbors);
+		neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceHC, sizeNeighbors);
 		int i= 0;
 //		Boolean restart= true;
 
@@ -93,9 +94,9 @@ public class MultiobjectiveHillClimbingDistance extends Generator{
 				}
 				int coutrestart=0;
 				while (stop == false && coutrestart < sizeNeighbors && accept==false) {
-					stateCandidate = Strategy.getStrategy().getProblem().getOperator().generateRandomState(1).get(0);
+					stateCandidate = StrategyRequirements.requireOperator().generateRandomState(1).get(0);
 					if (Contain(stateCandidate)==false) {
-						Strategy.getStrategy().getProblem().Evaluate(stateCandidate);  
+						StrategyRequirements.requireProblem().Evaluate(stateCandidate);  
 						visitedState.add(stateCandidate);
 						stop=true;
 						coutrestart++;

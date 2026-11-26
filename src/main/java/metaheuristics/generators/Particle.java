@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -79,12 +80,12 @@ public class Particle extends Generator {
     	ParticleSwarmOptimization.constriction = 2/(Math.abs(2 - learning-Math.sqrt((learning * learning)- 4 * learning)));   // Factor de costriccion
     	ArrayList<Object> actualVelocity = new ArrayList<Object>();
     	if(velocity.isEmpty()){
-    		for (int i = 0; i < Strategy.getStrategy().getProblem().getState().getCode().size(); i++){
+    		for (int i = 0; i < StrategyRequirements.requireInitialState().getCode().size(); i++){
     			velocity.add(0.0);
     		}
     	}
     	// recorre el vector velocidad y lo actualiza
-    	for (int i = 0; i < Strategy.getStrategy().getProblem().getState().getCode().size(); i++) {  
+    	for (int i = 0; i < StrategyRequirements.requireInitialState().getCode().size(); i++) {  
     		// cumulo donde se encuentra la particula
     		int swarm = ParticleSwarmOptimization.countParticle / ParticleSwarmOptimization.countParticleBySwarm; 
            	inertia = w * (Double)velocity.get(i);  
@@ -147,7 +148,7 @@ public class Particle extends Generator {
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		// TODO Auto-generated method stub
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			if(stateActual.getEvaluation().get(0) > statePBest.getEvaluation().get(0)){
 				statePBest.setCode(new ArrayList<Object>(stateActual.getCode()));
 				statePBest.setEvaluation(stateActual.getEvaluation());

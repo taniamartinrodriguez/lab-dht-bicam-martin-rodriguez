@@ -1,4 +1,5 @@
 package problem.extension;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.util.ArrayList;
 
@@ -14,11 +15,11 @@ public class MultiObjetivoPuro extends SolutionMethod {
 	public void evaluationState(State state) {
 		// TODO Auto-generated method stub
 		double tempEval = -1;
-		ArrayList<Double> evaluation = new ArrayList<Double>(Strategy.getStrategy().getProblem().getFunction().size());
-		for (int i = 0; i < Strategy.getStrategy().getProblem().getFunction().size(); i++)
+		ArrayList<Double> evaluation = new ArrayList<Double>(StrategyRequirements.requireFunctions().size());
+		for (int i = 0; i < StrategyRequirements.requireFunctions().size(); i++)
 		{
-			ObjetiveFunction objfunction = (ObjetiveFunction)Strategy.getStrategy().getProblem().getFunction().get(i);
-			if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+			ObjetiveFunction objfunction = (ObjetiveFunction)StrategyRequirements.requireFunctions().get(i);
+			if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 				if(objfunction.getTypeProblem().equals(ProblemType.Maximizar))
 				{
 					tempEval = objfunction.Evaluation(state);

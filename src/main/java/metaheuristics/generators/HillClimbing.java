@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class HillClimbing extends Generator{
 		super();
 		this.typeAcceptation = AcceptType.AcceptBest;
 		this.strategy = StrategyType.NORMAL;
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)) {
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)) {
 			this.typeCandidate = CandidateType.GreaterCandidate;
 		}
 		else{
@@ -61,7 +62,7 @@ public class HillClimbing extends Generator{
 	@Override
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		List<State> neighborhood = new ArrayList<State>();
-		neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceHC, operatornumber);
+		neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceHC, operatornumber);
 	    State statecandidate = candidatevalue.stateCandidate(stateReferenceHC, typeCandidate, strategy, operatornumber, neighborhood);
 	  
 	    return statecandidate;

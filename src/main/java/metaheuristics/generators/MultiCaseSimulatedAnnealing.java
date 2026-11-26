@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class MultiCaseSimulatedAnnealing extends Generator {
 	@Override
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		List<State> neighborhood = new ArrayList<State>();
-		Problem problem = Strategy.getStrategy().getProblem();
+		Problem problem = StrategyRequirements.requireProblem();
 		neighborhood = problem.getOperator().generatedNewState(stateReferenceSA, operatornumber);
 	    State statecandidate = candidatevalue.stateCandidate(stateReferenceSA, typeCandidate, strategy, operatornumber, neighborhood);
 	    return statecandidate;

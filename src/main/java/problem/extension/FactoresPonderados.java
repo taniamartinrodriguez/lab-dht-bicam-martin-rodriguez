@@ -1,4 +1,5 @@
 package problem.extension;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.util.ArrayList;
 
@@ -14,29 +15,29 @@ public class FactoresPonderados extends SolutionMethod {
 		// TODO Auto-generated method stub
 		double eval = 0;       
 		double tempWeight = 0;	
-		ArrayList<Double> evaluation = new ArrayList<Double>(Strategy.getStrategy().getProblem().getFunction().size());
+		ArrayList<Double> evaluation = new ArrayList<Double>(StrategyRequirements.requireFunctions().size());
 		
-		for (int i = 0; i < Strategy.getStrategy().getProblem().getFunction().size(); i++) {
+		for (int i = 0; i < StrategyRequirements.requireFunctions().size(); i++) {
 
 			tempWeight = 0;
-			if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
-				if(Strategy.getStrategy().getProblem().getFunction().get(i).getTypeProblem().equals(ProblemType.Maximizar)){
-					tempWeight = Strategy.getStrategy().getProblem().getFunction().get(i).Evaluation(state);
-					tempWeight = tempWeight * Strategy.getStrategy().getProblem().getFunction().get(i).getWeight();
+			if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
+				if(StrategyRequirements.requireFunctions().get(i).getTypeProblem().equals(ProblemType.Maximizar)){
+					tempWeight = StrategyRequirements.requireFunctions().get(i).Evaluation(state);
+					tempWeight = tempWeight * StrategyRequirements.requireFunctions().get(i).getWeight();
 				}
 				else{
-					tempWeight = 1 - Strategy.getStrategy().getProblem().getFunction().get(i).Evaluation(state);
-					tempWeight = tempWeight * Strategy.getStrategy().getProblem().getFunction().get(i).getWeight();
+					tempWeight = 1 - StrategyRequirements.requireFunctions().get(i).Evaluation(state);
+					tempWeight = tempWeight * StrategyRequirements.requireFunctions().get(i).getWeight();
 				}
 			}
 			else{
-				if(Strategy.getStrategy().getProblem().getFunction().get(i).getTypeProblem().equals(ProblemType.Maximizar)){
-					tempWeight = 1 - Strategy.getStrategy().getProblem().getFunction().get(i).Evaluation(state);
-					tempWeight = tempWeight * Strategy.getStrategy().getProblem().getFunction().get(i).getWeight();
+				if(StrategyRequirements.requireFunctions().get(i).getTypeProblem().equals(ProblemType.Maximizar)){
+					tempWeight = 1 - StrategyRequirements.requireFunctions().get(i).Evaluation(state);
+					tempWeight = tempWeight * StrategyRequirements.requireFunctions().get(i).getWeight();
 				}
 				else{
-					tempWeight = Strategy.getStrategy().getProblem().getFunction().get(i).Evaluation(state);
-					tempWeight = tempWeight * Strategy.getStrategy().getProblem().getFunction().get(i).getWeight();
+					tempWeight = StrategyRequirements.requireFunctions().get(i).Evaluation(state);
+					tempWeight = tempWeight * StrategyRequirements.requireFunctions().get(i).getWeight();
 				}
 			}
 			eval += tempWeight;

@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -68,8 +69,9 @@ public class EvolutionStrategies extends Generator {
     	iffatherselection = new FactoryFatherSelection();
     	FatherSelection selection = iffatherselection.createSelectFather(selectionType);
     	List<State> fathers = selection.selection(this.listStateReference, truncation);
+        StrategyRequirements.requireStates(fathers);
     	int pos1 = (int)(Math.random() * fathers.size());
-    	State candidate = (State) Strategy.getStrategy().getProblem().getState().getCopy();
+    	State candidate = (State) StrategyRequirements.requireInitialState().getCopy();
     	candidate.setCode(new ArrayList<Object>(fathers.get(pos1).getCode()));
     	candidate.setEvaluation(fathers.get(pos1).getEvaluation());
     	candidate.setNumber(fathers.get(pos1).getNumber());
@@ -85,8 +87,10 @@ public class EvolutionStrategies extends Generator {
 
 	@Override
 	public State getReference() {
+        StrategyRequirements.requireStates(listStateReference);
+
 		stateReferenceES = listStateReference.get(0);
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			for (int i = 1; i < listStateReference.size(); i++) {
 				if(stateReferenceES.getEvaluation().get(0) < listStateReference.get(i).getEvaluation().get(0))
 					stateReferenceES = listStateReference.get(i);

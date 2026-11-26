@@ -1,4 +1,5 @@
 package problem_operators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,8 @@ public class MutationOperator extends Operator {
 	public List<State> generatedNewState(State stateCurrent, Integer operatornumber){
 		List<State> listNeigborhood = new ArrayList<State>();
 		for (int i = 0; i < operatornumber; i++){
-			int key = Strategy.getStrategy().getProblem().getCodification().getAleatoryKey();
-			Object candidate = Strategy.getStrategy().getProblem().getCodification().getVariableAleatoryValue(key);
+			int key = StrategyRequirements.requireCodification().getAleatoryKey();
+			Object candidate = StrategyRequirements.requireCodification().getVariableAleatoryValue(key);
 			State state = (State) stateCurrent.getCopy();
 			state.getCode().set(key, candidate);
 			listNeigborhood.add(state);

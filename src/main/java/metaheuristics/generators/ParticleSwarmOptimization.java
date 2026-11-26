@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class ParticleSwarmOptimization extends Generator {
 			State reference = new State();
 			reference = listParticle.get(countParticle).getStatePBest();
 			int iterator = countParticleBySwarm + countParticle;
-			if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+			if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 				for (int i = countParticle; i < iterator; i++) {
 					if (listParticle.get(i).getStatePBest().getEvaluation().get(0) > reference.getEvaluation().get(0))
 						reference = listParticle.get(i).getStatePBest();
@@ -186,7 +187,7 @@ public class ParticleSwarmOptimization extends Generator {
 		Particle particle = new Particle();
 		particle = listParticle.get(countParticle);
 		int swarm = countParticle/countParticleBySwarm;
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			if ((lBest[swarm]).getEvaluation().get(0) < particle.getStatePBest().getEvaluation().get(0)){
 				lBest[swarm] = particle.getStatePBest();
 				if(lBest[swarm].getEvaluation().get(0) > getReferenceList().get(getReferenceList().size() - 1).getEvaluation().get(0)){
@@ -217,7 +218,7 @@ public class ParticleSwarmOptimization extends Generator {
 	public State gBestInicial (){
 		State stateBest = lBest[0];
 		for (int i = 1; i < lBest.length; i++) {
-			if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+			if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 				if (lBest[i].getEvaluation().get(0) > stateBest.getEvaluation().get(0)){
 					stateBest = lBest[i];
 				}

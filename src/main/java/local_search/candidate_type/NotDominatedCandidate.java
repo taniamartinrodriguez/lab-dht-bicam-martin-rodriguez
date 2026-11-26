@@ -33,7 +33,7 @@ public class NotDominatedCandidate extends SearchCandidate {
         // Validar antes de invocar Evaluate evita el acceso nulo de la incidencia
         // original y permite comunicar una configuracion incompleta claramente.
         StrategyRequirements.requireProblemType();
-        Problem problem = Strategy.getStrategy().getProblem();
+        Problem problem = StrategyRequirements.requireProblem();
         if (problem.getFunction() == null || problem.getFunction().isEmpty()) {
             throw new IllegalStateException("El problema no tiene funciones objetivo configuradas");
         }

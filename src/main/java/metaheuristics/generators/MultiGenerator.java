@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class MultiGenerator extends Generator {
 	public static void initializeGenerators() throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 //		Strategy.getStrategy().initializeGenerators();
 		initializeListGenerator();
-		State stateREF = new State(Strategy.getStrategy().getProblem().getState());
+		State stateREF = new State(StrategyRequirements.requireInitialState());
 		listStateReference.add(stateREF);
 		for (int i = 0; i < listGenerators.length; i++) {
 			if ((listGenerators[i].getType().equals(GeneratorType.HillClimbing)) || (listGenerators[i].getType().equals(GeneratorType.RandomSearch)) || (listGenerators[i].getType().equals(GeneratorType.TabuSearch)) || (listGenerators[i].getType().equals(GeneratorType.SimulatedAnnealing) || (listGenerators[i].getType().equals(GeneratorType.LimitThreshold)))){
@@ -120,11 +121,11 @@ public class MultiGenerator extends Generator {
 			State stateCandidate;
 			try {
 				stateCandidate = generator.generate(1);
-				Strategy.getStrategy().getProblem().Evaluate(stateCandidate);
+				StrategyRequirements.requireProblem().Evaluate(stateCandidate);
 				//stateCandidate.setEvaluation(stateCandidate.getEvaluation());
 				
 				//stateCandidate = generator.generate(1);
-				//Double evaluation = Strategy.getStrategy().getProblem().getFunction().get(0).Evaluation(stateCandidate);
+				//Double evaluation = StrategyRequirements.requireFunctions().get(0).Evaluation(stateCandidate);
 				//stateCandidate.getEvaluation().set(0, evaluation);
 				stateCandidate.setNumber(j);
 				stateCandidate.setTypeGenerator(generator.getType());
@@ -212,13 +213,13 @@ public class MultiGenerator extends Generator {
 		// TODO Auto-generated method stub
 		updateWeight(stateCandidate);
 		tournament(stateCandidate, countIterationsCurrent);
-		/*if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		/*if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			if((stateCandidate.getEvaluation() > listStateReference.get(listStateReference.size() - 1).getEvaluation()))
 				listStateReference.add(stateCandidate);
 			else listStateReference.add(listStateReference.get(listStateReference.size() - 1)); 
 		}
 		else{
-			if((Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Minimizar)) && (stateCandidate.getEvaluation() < listStateReference.get(listStateReference.size() - 1).getEvaluation()))
+			if((StrategyRequirements.requireProblemType().equals(ProblemType.Minimizar)) && (stateCandidate.getEvaluation() < listStateReference.get(listStateReference.size() - 1).getEvaluation()))
 				listStateReference.add(stateCandidate);
 			else listStateReference.add(listStateReference.get(listStateReference.size() - 1));
 		} */
@@ -232,7 +233,7 @@ public class MultiGenerator extends Generator {
 	}
 	
 	public boolean searchState(State stateCandidate) {
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			if(stateCandidate.getEvaluation().get(0) > Strategy.getStrategy().getBestState().getEvaluation().get(0)){
 				if(stateCandidate.getEvaluation().get(0) > Strategy.getStrategy().getBestState().getEvaluation().get(0))
 					activeGenerator.countBetterGender++;

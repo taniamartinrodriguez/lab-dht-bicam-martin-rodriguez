@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -68,11 +69,12 @@ public class DistributionEstimationAlgorithm extends Generator {
 	}
 	
 	public State MaxValue (List<State> listInd){
-		State state = new State(listInd.get(0));
-		double max = state.getEvaluation().get(0);
+		StrategyRequirements.requireStates(listInd);
+        State state = new State(listInd.get(0));
+		double max = StrategyRequirements.requireFirstEvaluation(state);
 		for (int i = 1; i < listInd.size(); i++) {
-			if(listInd.get(i).getEvaluation().get(0) > max){
-				max = listInd.get(i).getEvaluation().get(0);
+			if(StrategyRequirements.requireFirstEvaluation(listInd.get(i)) > max){
+				max = StrategyRequirements.requireFirstEvaluation(listInd.get(i));
 				state = new State(listInd.get(i));
 			}
 		}
@@ -83,7 +85,7 @@ public class DistributionEstimationAlgorithm extends Generator {
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException,	NoSuchMethodException {
 		//********************selection*****************************
 		//ProblemState candidate = new ProblemState();
-		/*State candidate = new State();//(State) Strategy.getStrategy().getProblem().getState().clone()
+		/*State candidate = new State();//(State) StrategyRequirements.requireInitialState().clone()
 		List<State> fathers = new ArrayList<State>();
 		fathers = getfathersList();
 		//**************************distribution***********************************
@@ -101,7 +103,7 @@ public class DistributionEstimationAlgorithm extends Generator {
     	return candidate;*/	
     	
     	//***************************version 1.0
-    	//ArrayList<State> listcandidate = new ArrayList<State>();//(State) Strategy.getStrategy().getProblem().getState().clone()
+    	//ArrayList<State> listcandidate = new ArrayList<State>();//(State) StrategyRequirements.requireInitialState().clone()
 		
     	List<State> fathers = new ArrayList<State>();
 		fathers = getfathersList();
@@ -109,12 +111,13 @@ public class DistributionEstimationAlgorithm extends Generator {
     	Sampling samplingG = iffsampling.createSampling(Samplingtype);
     	List<State> ind = samplingG.sampling(fathers, operatornumber);
     	State candidate = null;
+        StrategyRequirements.requireStates(ind);
     	if(ind.size() > 1){
     		for (int i = 0; i < ind.size(); i++) {
-    			double evaluation = Strategy.getStrategy().getProblem().getFunction().get(0).Evaluation(ind.get(i));
+    			double evaluation = StrategyRequirements.requireFunctions().get(0).Evaluation(ind.get(i));
     			ArrayList<Double> listEval = new ArrayList<Double>();
     			listEval.add(evaluation);
-    			ind.get(0).setEvaluation(listEval);
+    			ind.get(i).setEvaluation(listEval);
     		}
     		candidate = MaxValue(ind);
     	}
@@ -130,8 +133,10 @@ public class DistributionEstimationAlgorithm extends Generator {
     		
 	@Override
 	public State getReference() {
+        StrategyRequirements.requireStates(referenceList);
+
 		stateReferenceDA = referenceList.get(0);
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)){
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)){
 			for (int i = 1; i < referenceList.size(); i++) {
 				if(stateReferenceDA.getEvaluation().get(0) < referenceList.get(i).getEvaluation().get(0))
 					stateReferenceDA = referenceList.get(i);

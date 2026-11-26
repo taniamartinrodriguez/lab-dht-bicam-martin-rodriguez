@@ -64,6 +64,7 @@ public class Strategy {
 
 	private Strategy(){
 		super();
+		this.mapGenerators = new TreeMap<GeneratorType, Generator>();
 	}
 
 	public static Strategy getStrategy() {
@@ -74,6 +75,16 @@ public class Strategy {
 	}
 
 	public void executeStrategy (int countmaxIterations, int countIterationsChange, int operatornumber, GeneratorType generatorType) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException{
+		if (problem == null) {
+			throw new IllegalStateException("Configura un Problem antes de ejecutar Strategy");
+		}
+		if (generatorType == null) {
+			throw new IllegalArgumentException("generatorType no puede ser null");
+		}
+		if (stopexecute == null) {
+			throw new IllegalStateException("Configura StopExecute antes de ejecutar Strategy");
+		}
+
 		// si se quiere calcular el tiempo de ejecucion del un algoritmo
 		if(calculateTime == true){
 			initialTime = System.currentTimeMillis();
@@ -165,10 +176,10 @@ public class Strategy {
 				//actualizar el mejor estado encontrado solo tiene sentido para algoritmos monoobjetivos
 				
 				//actualizar el mejor estado encontrado solo tiene sentido para algoritmos monoobjetivos
-				if ((getProblem().getTypeProblem().equals(ProblemType.Maximizar)) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) < stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
+				if ((StrategyRequirements.requireProblemType() == ProblemType.Maximizar) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) < stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
 					bestState = stateCandidate;
 				}
-				if ((problem.getTypeProblem().equals(ProblemType.Minimizar)) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) > stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
+				if ((StrategyRequirements.requireProblemType() == ProblemType.Minimizar) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) > stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
 					bestState = stateCandidate;
 				}
 				//					System.out.println("Evaluacion: "+ bestState.getEvaluation());
@@ -212,10 +223,10 @@ public class Strategy {
 				}
 				countCurrent = UpdateParameter.updateParameter(countCurrent);
 				//actualizar el mejor estado encontrado solo tiene sentido para algoritmos monoobjetivos
-				if ((getProblem().getTypeProblem().equals(ProblemType.Maximizar)) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) < stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
+				if ((StrategyRequirements.requireProblemType() == ProblemType.Maximizar) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) < stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
 					bestState = stateCandidate;
 				}
-				if ((problem.getTypeProblem().equals(ProblemType.Minimizar)) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) > stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
+				if ((StrategyRequirements.requireProblemType() == ProblemType.Minimizar) && bestState.getEvaluation().get(bestState.getEvaluation().size() - 1) > stateCandidate.getEvaluation().get(bestState.getEvaluation().size() - 1)) {
 					bestState = stateCandidate;
 				}
 				//					System.out.println("Evaluacion: "+ bestState.getEvaluation());
@@ -334,18 +345,15 @@ public class Strategy {
 		this.problem = problem;
 	}
 
+	/** Claves de generadores registrados, sin parsear cadenas ni indexar un mapa nulo. */
 	public ArrayList<String> getListKey(){
-		ArrayList<String> listKeys = new ArrayList<String>();
-		String key = mapGenerators.keySet().toString();
-		String returnString = key.substring(1, key.length() - 1);
-		returnString = returnString + ", ";
-		int countKey = mapGenerators.size();
-		for (int i = 0; i < countKey; i++) {
-			String r = returnString.substring(0, returnString.indexOf(','));
-			returnString = returnString.substring(returnString.indexOf(',') + 2);
-			listKeys.add(r);
+		ArrayList<String> result = new ArrayList<String>();
+		if (mapGenerators != null) {
+			for (GeneratorType key : mapGenerators.keySet()) {
+				result.add(key.toString());
+			}
 		}
-		return listKeys;
+		return result;
 	}
 
 	public void initializeGenerators()throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -407,7 +415,7 @@ public class Strategy {
 //		problem.setRef(ref);
 		if(generatorType.equals(GeneratorType.MultiGenerator)){
 			updateRefMultiG();
-			bestState = MultiGenerator.listStateReference.get( MultiGenerator.listStateReference.size() - 1);
+			bestState = StrategyRequirements.requireStates(MultiGenerator.listStateReference).get(MultiGenerator.listStateReference.size() - 1);
 		}
 		else{
 			updateRefGenerator(generator);
@@ -421,7 +429,7 @@ public class Strategy {
 	}
 	public void updateRefGenerator(Generator generator) {
 		if(generator.getType().equals(GeneratorType.HillClimbing) || generator.getType().equals(GeneratorType.TabuSearch) || generator.getType().equals(GeneratorType.RandomSearch) || generator.getType().equals(GeneratorType.SimulatedAnnealing)){
-			double evaluation = getProblem().getFunction().get(0).Evaluation(generator.getReference());
+			double evaluation = StrategyRequirements.requireFunctions().get(0).Evaluation(generator.getReference());
 			generator.getReference().getEvaluation().set(0, evaluation);
 //			State state = new State();
 //			state.setEvaluation(evaluation);
@@ -434,7 +442,7 @@ public class Strategy {
 		}
 		if(generator.getType().equals(GeneratorType.GeneticAlgorithm) || generator.getType().equals(GeneratorType.DistributionEstimationAlgorithm) || generator.getType().equals(GeneratorType.EvolutionStrategies)){
 			for (int j = 0; j < generator.getReferenceList().size(); j++) {
-				double evaluation = getProblem().getFunction().get(0).Evaluation(generator.getReferenceList().get(j));
+				double evaluation = StrategyRequirements.requireFunctions().get(0).Evaluation(generator.getReferenceList().get(j));
 				generator.getReferenceList().get(j).getEvaluation().set(0, evaluation);
 			}
 		}

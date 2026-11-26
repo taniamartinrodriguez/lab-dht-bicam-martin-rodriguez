@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -55,9 +56,9 @@ public class TabuSearch extends Generator {
 		this.strategy = StrategyType.TABU;
 		
 		
-		Problem problem = Strategy.getStrategy().getProblem();
+		Problem problem = StrategyRequirements.requireProblem();
 
-		if(problem.getTypeProblem().equals(ProblemType.Maximizar)) {
+		if(StrategyRequirements.requireProblemType() == ProblemType.Maximizar) {
 			this.typeCandidate = CandidateType.GreaterCandidate;
 		}
 		else{
@@ -77,7 +78,7 @@ public class TabuSearch extends Generator {
 	public State generate(Integer operatornumber) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		//ArrayList<State>list=new ArrayList<State>();
 		List<State> neighborhood = new ArrayList<State>();
-		neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceTS, operatornumber);
+		neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceTS, operatornumber);
 	    State statecandidate = candidatevalue.stateCandidate(stateReferenceTS, typeCandidate, strategy, operatornumber, neighborhood);
 	   // list.add(statecandidate);
 	    return statecandidate;

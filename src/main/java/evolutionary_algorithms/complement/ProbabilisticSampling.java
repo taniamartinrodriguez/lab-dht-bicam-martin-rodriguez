@@ -1,7 +1,9 @@
 package evolutionary_algorithms.complement;
+import metaheurictics.strategy.StrategyRequirements;
 
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.List;
 
 import metaheurictics.strategy.Strategy;
@@ -15,11 +17,18 @@ public class ProbabilisticSampling extends Sampling {
 	@Override
 	public List<State> sampling(List<State> fathers, int countInd) {
 		// TODO Auto-generated method stub
+        StrategyRequirements.requireStates(fathers);
+        if (countInd < 0) {
+            throw new IllegalArgumentException("countInd no puede ser negativo");
+        }
+        if (StrategyRequirements.requireProblem().getPossibleValue() <= 0) {
+            throw new IllegalStateException("El numero de valores posibles debe ser positivo");
+        }
 		int cantV = fathers.get(0).getCode().size();
 		List<State> staList = listState(countInd);
 		for (int i = 0; i < cantV; i++) {
 			Object[] values = new Object[fathers.size()]; // arreglo de valores de una variable
-			Object[] arrtemp = new Object[Strategy.getStrategy().getProblem().getPossibleValue()];
+			Object[] arrtemp = new Object[StrategyRequirements.requireProblem().getPossibleValue()];
 			//llenar el arreglo con todos los valores posibles
 			for (int j = 0; j < arrtemp.length; j++) {
 				arrtemp[j] = j;
@@ -35,7 +44,7 @@ public class ProbabilisticSampling extends Sampling {
 			while (k < arrtemp.length) {
 				int count = 0;
 				for (int j = 0; j < values.length; j++) {
-					if((Integer)values[j] != -1 && values[j] == arrtemp[k]){ //
+					if((Integer)values[j] != -1 && Objects.equals(values[j], arrtemp[k])){ //
 						count++;
 						values[j] = -1;
 					}
@@ -57,7 +66,7 @@ public class ProbabilisticSampling extends Sampling {
 					else p++;
 				}
 				if(find == false){
-					int value = new Integer((int)(Math.random() * (double)(Strategy.getStrategy().getProblem().getCodification().getVariableCount() * 10)));
+					int value = Integer.valueOf((int)(Math.random() * (double)(StrategyRequirements.requireCodification().getVariableCount() * 10)));
 					staList.get(l).getCode().add(value);
 				}
 				

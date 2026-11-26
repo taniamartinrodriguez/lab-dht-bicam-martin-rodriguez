@@ -1,4 +1,5 @@
 package evolutionary_algorithms.complement;
+import metaheurictics.strategy.StrategyRequirements;
 
 import metaheurictics.strategy.Strategy;
 import problem.definition.Codification;
@@ -11,7 +12,7 @@ final class MutationConfiguration {
     }
 
     static Codification requireCodification() {
-        Problem problem = Strategy.getStrategy().getProblem();
+        Problem problem = StrategyRequirements.requireProblem();
         if (problem == null) {
             throw new IllegalStateException(
                     "No se ha configurado un Problem en Strategy antes de mutar");

@@ -1,4 +1,5 @@
 package metaheuristics.generators;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class HillClimbingRestart extends Generator{
 		countCurrent = count;
 		this.typeAcceptation = AcceptType.AcceptBest;
 		this.strategy = StrategyType.NORMAL;
-		if(Strategy.getStrategy().getProblem().getTypeProblem().equals(ProblemType.Maximizar)) {
+		if(StrategyRequirements.requireProblemType().equals(ProblemType.Maximizar)) {
 			this.typeCandidate = CandidateType.GreaterCandidate;
 		}
 		else{
@@ -68,11 +69,11 @@ public class HillClimbingRestart extends Generator{
 		if(count == Strategy.getStrategy().getCountCurrent()){
 			State stateR = new State(stateReferenceHC);
 			listRef.add(stateR);
-			stateReferenceHC = Strategy.getStrategy().getProblem().getOperator().generateRandomState(1).get(0);
-			Strategy.getStrategy().getProblem().Evaluate(stateReferenceHC);
+			stateReferenceHC = StrategyRequirements.requireOperator().generateRandomState(1).get(0);
+			StrategyRequirements.requireProblem().Evaluate(stateReferenceHC);
 			count = count + countCurrent;
 		}
-		List<State> neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceHC, operatornumber);
+		List<State> neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceHC, operatornumber);
 		statecandidate = candidatevalue.stateCandidate(stateReferenceHC, typeCandidate, strategy, operatornumber, neighborhood);
 		//list.add(statecandidate);
 		return statecandidate;
@@ -167,13 +168,13 @@ public class HillClimbingRestart extends Generator{
 				if(countSame == count-1){
 					State stateR = new State(stateReferenceHC);
 					listRef.add(stateR);
-					stateReferenceHC = Strategy.getStrategy().getProblem().getOperator().generateRandomState(1).get(0);
+					stateReferenceHC = StrategyRequirements.requireOperator().generateRandomState(1).get(0);
 				}
 			}
 			else
 				countSame = 1;
 		}
-		List<State> neighborhood = Strategy.getStrategy().getProblem().getOperator().generatedNewState(stateReferenceHC, operatornumber);
+		List<State> neighborhood = StrategyRequirements.requireOperator().generatedNewState(stateReferenceHC, operatornumber);
 		statecandidate = candidatevalue.stateCandidate(stateReferenceHC, typeCandidate, strategy, operatornumber, neighborhood);
 		return statecandidate;
 	}

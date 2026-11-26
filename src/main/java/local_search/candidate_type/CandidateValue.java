@@ -1,4 +1,5 @@
 package local_search.candidate_type;
+import metaheurictics.strategy.StrategyRequirements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class CandidateValue {
             if (available.isEmpty()) {
                 // El codigo original se llamaba recursivamente sin limite cuando
                 // todos los vecinos eran tabu. Regenerar una sola vez evita ese bucle.
-                Problem problem = Strategy.getStrategy().getProblem();
+                Problem problem = StrategyRequirements.requireProblem();
                 Operator operator = problem == null ? null : problem.getOperator();
                 if (operator == null) {
                     throw new IllegalStateException(
