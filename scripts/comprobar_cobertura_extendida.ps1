@@ -19,7 +19,11 @@ $classes = @(
  'metaheurictics/strategy/StrategyRequirements',
  'evolutionary_algorithms/complement/SteadyStateReplace',
  'evolutionary_algorithms/complement/TruncationSelection',
- 'local_search/acceptation_type/AcceptBest'
+ 'local_search/acceptation_type/AcceptBest',
+ 'local_search/acceptation_type/AcceptNotBad',
+ 'local_search/acceptation_type/AcceptNotBadT',
+ 'local_search/acceptation_type/AcceptNotBadU',
+ 'local_search/acceptation_type/Dominance'
 )
 $results = foreach ($className in $classes) {
     $node = $report.SelectSingleNode("/report/package/class[@name='$className']")
