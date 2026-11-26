@@ -23,7 +23,9 @@ $classes = @(
  'local_search/acceptation_type/AcceptNotBad',
  'local_search/acceptation_type/AcceptNotBadT',
  'local_search/acceptation_type/AcceptNotBadU',
- 'local_search/acceptation_type/Dominance'
+ 'local_search/acceptation_type/Dominance',
+ 'local_search/candidate_type/CandidateValue',
+ 'local_search/candidate_type/NotDominatedCandidate'
 )
 $results = foreach ($className in $classes) {
     $node = $report.SelectSingleNode("/report/package/class[@name='$className']")

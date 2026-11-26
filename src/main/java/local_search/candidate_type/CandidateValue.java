@@ -1,85 +1,105 @@
-/**
- * @(#) CandidateValue.java
- */
-
 package local_search.candidate_type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import problem.definition.State;
-
+import factory_interface.IFFactoryCandidate;
+import factory_method.FactoryCandidate;
 import local_search.complement.StrategyType;
 import local_search.complement.TabuSolutions;
 import metaheurictics.strategy.Strategy;
+import problem.definition.Operator;
+import problem.definition.Problem;
+import problem.definition.State;
 
-//import ceis.grial.problem.Problem;
-import factory_interface.IFFactoryCandidate;
-import factory_method.FactoryCandidate;
-
+/** Seleccion de candidatos de un vecindario, con filtrado opcional de tabu. */
 public class CandidateValue {
 
-	@SuppressWarnings("unused")
-	private StrategyType strategy;
+    private StrategyType strategy;
+    private IFFactoryCandidate ifFactory;
+    private CandidateType typecand;
+    private TabuSolutions tabusolution;
+    private SearchCandidate searchcandidate;
 
-	private IFFactoryCandidate ifFactory;
+    public CandidateValue() {
+    }
 
-	@SuppressWarnings("unused")
-	private CandidateType typecand;
+    public CandidateValue(StrategyType strategy, IFFactoryCandidate ifFactory,
+            CandidateType typecand, TabuSolutions tabusolution, SearchCandidate searchcandidate) {
+        this.strategy = strategy;
+        this.ifFactory = ifFactory;
+        this.typecand = typecand;
+        this.tabusolution = tabusolution;
+        this.searchcandidate = searchcandidate;
+    }
 
-	private TabuSolutions tabusolution;
+    public SearchCandidate newSearchCandidate(CandidateType typecandidate)
+            throws IllegalArgumentException, SecurityException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException, InvocationTargetException,
+            NoSuchMethodException {
+        Objects.requireNonNull(typecandidate, "typecandidate");
+        ifFactory = new FactoryCandidate();
+        searchcandidate = ifFactory.createSearchCandidate(typecandidate);
+        return searchcandidate;
+    }
 
-	private SearchCandidate searchcandidate;
+    public State stateCandidate(State stateCurrent, CandidateType typeCandidate,
+            StrategyType strategy, Integer operatornumber, List<State> neighborhood)
+            throws IllegalArgumentException, SecurityException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException, InvocationTargetException,
+            NoSuchMethodException {
+        Objects.requireNonNull(typeCandidate, "typeCandidate");
+        Objects.requireNonNull(strategy, "strategy");
+        List<State> available = checkedNeighborhood(neighborhood);
+        tabusolution = new TabuSolutions();
 
-	public CandidateValue(){}
+        if (strategy == StrategyType.TABU) {
+            available = withoutTabu(available);
+            if (available.isEmpty()) {
+                // El codigo original se llamaba recursivamente sin limite cuando
+                // todos los vecinos eran tabu. Regenerar una sola vez evita ese bucle.
+                Problem problem = Strategy.getStrategy().getProblem();
+                Operator operator = problem == null ? null : problem.getOperator();
+                if (operator == null) {
+                    throw new IllegalStateException(
+                            "No se pueden regenerar vecinos tabu sin un Operator configurado");
+                }
+                List<State> generated = operator.generatedNewState(neighborhood.get(0), operatornumber);
+                available = withoutTabu(checkedNeighborhood(generated));
+                if (available.isEmpty()) {
+                    throw new IllegalStateException(
+                            "La regeneracion no ha producido candidatos fuera de la lista tabu");
+                }
+            }
+        }
+        return newSearchCandidate(typeCandidate).stateSearch(available);
+    }
 
-	public CandidateValue(StrategyType strategy, IFFactoryCandidate ifFactory, CandidateType typecand, 
-			TabuSolutions tabusolution, SearchCandidate searchcandidate) { //, Strategy executegenerator
-		super();
-		this.strategy = strategy;
-		this.ifFactory = ifFactory;
-		this.typecand = typecand;
-		this.tabusolution = tabusolution;
-		this.searchcandidate = searchcandidate;
-	}
+    private static List<State> checkedNeighborhood(List<State> neighborhood) {
+        if (neighborhood == null || neighborhood.isEmpty()) {
+            throw new IllegalArgumentException("El vecindario no puede ser nulo ni vacio");
+        }
+        for (State neighbor : neighborhood) {
+            if (neighbor == null) {
+                throw new IllegalArgumentException("El vecindario no puede contener estados nulos");
+            }
+        }
+        return new ArrayList<>(neighborhood);
+    }
 
-	public SearchCandidate newSearchCandidate(CandidateType typecandidate) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		ifFactory = new FactoryCandidate();
-		searchcandidate = ifFactory.createSearchCandidate(typecandidate);
-		return searchcandidate;
-	}
+    private static List<State> withoutTabu(List<State> neighborhood) {
+        List<State> available = new ArrayList<>(neighborhood);
+        available.removeIf(TabuSolutions.listTabu::contains);
+        return available;
+    }
 
-	public State stateCandidate(State stateCurrent, CandidateType typeCandidate, StrategyType strategy, Integer operatornumber, List<State> neighborhood) throws IllegalArgumentException, SecurityException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException{
-		//Problem problem = ExecuteGenerator.getExecuteGenerator().getProblem();
-		State stateCandidate;
-		List<State> auxList = new ArrayList<State>();
-		for (int i = 0; i < neighborhood.size(); i++) {
-			auxList.add(neighborhood.get(i));
-		}
-		this.tabusolution = new TabuSolutions();
-		if (strategy.equals(StrategyType.TABU)) {
-			try {
-				auxList = this.tabusolution.filterNeighborhood(auxList);
-			}
-			catch (Exception e) {
-				Strategy strategys = Strategy.getStrategy();
-				if(strategys.getProblem()!=null){
-					neighborhood = strategys.getProblem().getOperator().generatedNewState(neighborhood.get(0), operatornumber);
-				}
-				return stateCandidate(stateCurrent, typeCandidate, strategy, operatornumber, neighborhood);
-			}
-		}
-		SearchCandidate searchCand = newSearchCandidate(typeCandidate);
-		stateCandidate = searchCand.stateSearch(auxList);
-		return stateCandidate;
-	}
+    public TabuSolutions getTabusolution() {
+        return tabusolution;
+    }
 
-	public TabuSolutions getTabusolution() {
-		return tabusolution;
-	}
-
-	public void setTabusolution(TabuSolutions tabusolution) {
-		this.tabusolution = tabusolution;
-	}
+    public void setTabusolution(TabuSolutions tabusolution) {
+        this.tabusolution = tabusolution;
+    }
 }
